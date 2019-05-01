@@ -7,10 +7,12 @@ if(isset($_GET['code'])){
     $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
     $client->setAccessToken($token);
     $_SESSION['token'] = $token;
-    header('Location: index.php');
+    echo("fuked here");
+    // header('Location: index.php');
 }
 
 if(!empty($_SESSION['token'])){
+    echo("stuck here");
     $client->setAccessToken($_SESSION['token']);
     if ($client->isAccessTokenExpired()) {
         unset($_SESSION['token']);
@@ -49,6 +51,7 @@ if($client->getAccessToken()){
     // echo($client->getAccessToken());
     if($_SESSION["userData"]){
         $_SESSION["loggedIn"]=1;
+        echo("lavada here");
         /*
         $output .= '<center>';
         $output  .= '<h2>Google Account Details</h2>';
@@ -65,6 +68,7 @@ if($client->getAccessToken()){
         $_SESSION["loggedIn"]=-1;
         $output = '<h3 style="color:red">Some problem occurred, please try again.</h3>';
     }
+
 }else{
     // Get login url
     $authUrl = $client->createAuthUrl();
