@@ -1,55 +1,80 @@
 <?php
 // Include configuration file
-// require_once 'permission.php';
 require_once __DIR__.'/vendor/autoload.php';
 
-session_start();
-ini_set(' session.save_path',realpath(dirname($_SERVER['DOCUMENT_ROOT'])));
-$client = new Google_Client();
-$client->setAuthConfig('client_secret_303235166535-nfblp1roplc8ku613gsm2to01g3cafjh.apps.googleusercontent.com.json');
-$client->setHostedDomain("iiitdm.ac.in");
-$client->addScope("https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.email");
+require_once 'permission.php';
 
-echo($_SESSION['access_token']);
-if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
-  $client->setAccessToken($_SESSION['access_token']);
-
-  $Oauth = new Google_Service_Oauth2($client);
-  $gpUserProfile = $Oauth->userinfo_v2_me->get();
-  //$gpUserProfile = $google_oauthV2->userinfo->get();
-  
- 
-  // Getting user profile info
-  $gpUserData = array();
-  $gpUserData['oauth_uid']  = !empty($gpUserProfile['id'])?$gpUserProfile['id']:'';
-  $gpUserData['first_name'] = !empty($gpUserProfile['given_name'])?$gpUserProfile['given_name']:'';
-  $gpUserData['last_name']  = !empty($gpUserProfile['family_name'])?$gpUserProfile['family_name']:'';
-  $gpUserData['email']      = !empty($gpUserProfile['email'])?$gpUserProfile['email']:'';
-  $gpUserData['gender']     = !empty($gpUserProfile['gender'])?$gpUserProfile['gender']:'';
-  $gpUserData['locale']     = !empty($gpUserProfile['locale'])?$gpUserProfile['locale']:'';
-  $gpUserData['picture']    = !empty($gpUserProfile['picture'])?$gpUserProfile['picture']:'';
-  $gpUserData['link']       = !empty($gpUserProfile['link'])?$gpUserProfile['link']:'';
-  
-
-  
-  // Storing user data in the session
-  $_SESSION['userData'] = $gpUserData;
-  // Render user profile data
-  // echo($client->getAccessToken());
-  if($_SESSION["userData"]){
-      $_SESSION["loggedIn"]=1;
-  }
-  else{
-      $_SESSION["loggedIn"]=-1;
-      $output = '<h3 style="color:red">Some problem occurred, please try again.</h3>';
-  }
-
-
-} else {
-  $redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . '/oauth2callback.php';
-  header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
+if(isset($_GET['code'])){
+    //$client->authenticate($_GET['code']);
+    //$_SESSION['token'] = $client->getAccessToken();
+    $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+    $client->setAccessToken($token);
+    $_SESSION['token'] = $token;
+    header('Location: index.php');
 }
 
+if(!empty($_SESSION['token'])){
+    $client->setAccessToken($_SESSION['token']);
+    if ($client->isAccessTokenExpired()) {
+        unset($_SESSION['token']);
+        $client->revokeToken();
+
+    // Destroy entire session data
+        session_destroy();
+      }
+}
+
+if($client->getAccessToken()){
+    // Get user profile data from google
+    $Oauth = new Google_Service_Oauth2($client);
+    $gpUserProfile = $Oauth->userinfo_v2_me->get();
+    //$gpUserProfile = $google_oauthV2->userinfo->get();
+    
+   
+    // Getting user profile info
+    $gpUserData = array();
+    $gpUserData['oauth_uid']  = !empty($gpUserProfile['id'])?$gpUserProfile['id']:'';
+    $gpUserData['first_name'] = !empty($gpUserProfile['given_name'])?$gpUserProfile['given_name']:'';
+    $gpUserData['last_name']  = !empty($gpUserProfile['family_name'])?$gpUserProfile['family_name']:'';
+    $gpUserData['email']      = !empty($gpUserProfile['email'])?$gpUserProfile['email']:'';
+    $gpUserData['gender']     = !empty($gpUserProfile['gender'])?$gpUserProfile['gender']:'';
+    $gpUserData['locale']     = !empty($gpUserProfile['locale'])?$gpUserProfile['locale']:'';
+    $gpUserData['picture']    = !empty($gpUserProfile['picture'])?$gpUserProfile['picture']:'';
+    $gpUserData['link']       = !empty($gpUserProfile['link'])?$gpUserProfile['link']:'';
+    
+    // Insert or update user data to the database
+    $gpUserData['oauth_provider'] = 'google';
+    
+    
+    // Storing user data in the session
+    $_SESSION['userData'] = $gpUserData;
+    // Render user profile data
+    // echo($client->getAccessToken());
+    if($_SESSION["userData"]){
+        $_SESSION["loggedIn"]=1;
+        /*
+        $output .= '<center>';
+        $output  .= '<h2>Google Account Details</h2>';
+        $output .= '<img src="'.$gpUserData['picture'].'">';
+        $output .= '<p><b>Google ID:</b> '.$gpUserData['oauth_uid'].'</p>';
+        $output .= '<p><b>Name:</b> '.$gpUserData['first_name'].' '.$gpUserData['last_name'].'</p>';
+        $output .= '<p><b>Email:</b> '.$gpUserData['email'].'</p>';
+        $output .= '<p><b>Logged in with:</b> Google</p>';
+        $output .= '<p><a href="'.$gpUserData['link'].'" target="_blank">Click to visit Google+</a></p>';
+        $output .= '<p>Logout from <a href="logout.php">Google</a></p>';
+        $output .= '</center>';
+        */
+    }else{
+        $_SESSION["loggedIn"]=-1;
+        $output = '<h3 style="color:red">Some problem occurred, please try again.</h3>';
+    }
+}else{
+    // Get login url
+    $authUrl = $client->createAuthUrl();
+    $_SESSION["loggedIn"]=0;
+    // Render google login button
+    $output = '<a href="'.filter_var($authUrl, FILTER_SANITIZE_URL).'" class="login-bt">login</a>';
+}
 
 ?>
 
