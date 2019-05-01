@@ -4,14 +4,14 @@ require_once __DIR__.'/vendor/autoload.php';
 
 require_once 'permission.php';
 
-if(isset($_GET['code'])){
-    //$client->authenticate($_GET['code']);
-    //$_SESSION['token'] = $client->getAccessToken();
-    $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-    $client->setAccessToken($token);
-    $_SESSION['token'] = $token;
-    header('Location: index.php');
-}
+// if(isset($_GET['code'])){
+//     //$client->authenticate($_GET['code']);
+//     //$_SESSION['token'] = $client->getAccessToken();
+//     $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+//     $client->setAccessToken($token);
+//     $_SESSION['token'] = $token;
+//     header('Location: index.php');
+// }
 
 if(!empty($_SESSION['token'])){
     $client->setAccessToken($_SESSION['token']);
@@ -24,8 +24,11 @@ if(!empty($_SESSION['token'])){
       }
 }
 
-if($client->getAccessToken()){
+if(isset($_GET['code'])){
     // Get user profile data from google
+    $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+    $client->setAccessToken($token);
+    $_SESSION['token'] = $token;
     $Oauth = new Google_Service_Oauth2($client);
     $gpUserProfile = $Oauth->userinfo_v2_me->get();
     //$gpUserProfile = $google_oauthV2->userinfo->get();
