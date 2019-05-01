@@ -10,6 +10,7 @@ $client->setAuthConfig('client_secret_303235166535-nfblp1roplc8ku613gsm2to01g3ca
 $client->setHostedDomain("iiitdm.ac.in");
 $client->addScope("https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.email");
 
+echo($_SESSION['access_token']);
 if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
   $client->setAccessToken($_SESSION['access_token']);
 
