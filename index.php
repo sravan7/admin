@@ -1,9 +1,6 @@
 <?php
 // Include configuration file
-require_once __DIR__.'/vendor/autoload.php';
-
 require_once 'permission.php';
-
 if(isset($_GET['code'])){
     //$client->authenticate($_GET['code']);
     //$_SESSION['token'] = $client->getAccessToken();
@@ -24,11 +21,8 @@ if(!empty($_SESSION['token'])){
       }
 }
 
-if(isset($_GET['code'])){
+if($client->getAccessToken()){
     // Get user profile data from google
-    $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-    $client->setAccessToken($token);
-    $_SESSION['token'] = $token;
     $Oauth = new Google_Service_Oauth2($client);
     $gpUserProfile = $Oauth->userinfo_v2_me->get();
     //$gpUserProfile = $google_oauthV2->userinfo->get();
@@ -78,7 +72,6 @@ if(isset($_GET['code'])){
     // Render google login button
     $output = '<a href="'.filter_var($authUrl, FILTER_SANITIZE_URL).'" class="login-bt">login</a>';
 }
-
 ?>
 
 <!doctype HTML>
@@ -100,7 +93,6 @@ if(isset($_GET['code'])){
    <!-- <h1> <?= $_SESSION["loggedIn"]===0; ?></h1>
     <h1> <?= $_SESSION["loggedIn"]===1; ?></h1>
     -->
-   
     <?php if ($_SESSION["loggedIn"]===1) { ?>
    
       <?php
