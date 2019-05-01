@@ -12,10 +12,7 @@
         
     if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
         $client->setAccessToken($_SESSION['access_token']);
-    } else {
-        $redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . '/index.php';
-        header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
-    }
+    } 
         
     $client->setRedirectUri('http://' . $_SERVER['HTTP_HOST'] . '/index.php');
         
