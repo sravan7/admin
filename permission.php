@@ -9,7 +9,7 @@
     $client->setHostedDomain("iiitdm.ac.in");
     $client->addScope("https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.email");
 
-    $client->setRedirectUri('http://' . $_SERVER['HTTP_HOST'] . '/index.php');
+    $client->setRedirectUri('https://' . $_SERVER['HTTP_HOST'] . '/index.php');
         
 ?>
 
