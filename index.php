@@ -5,6 +5,8 @@ require_once __DIR__.'/vendor/autoload.php';
 
 session_start();
 
+
+
 if(isset($_GET['code'])){
     // Get user profile data from google
     $_SESSION['access_token'] = $client->getAccessToken();
@@ -78,7 +80,7 @@ if(isset($_GET['code'])){
    <!-- <h1> <?= $_SESSION["loggedIn"]===0; ?></h1>
     <h1> <?= $_SESSION["loggedIn"]===1; ?></h1>
     -->
-    <?=  "sdsdf" ?>
+   
     <?php if ($_SESSION["loggedIn"]===1) { ?>
    
       <?php

@@ -8,12 +8,7 @@
     $client->setIncludeGrantedScopes(true);   // incremental auth
     $client->setHostedDomain("iiitdm.ac.in");
     $client->addScope("https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.email");
-    
-        
-    if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
-        $client->setAccessToken($_SESSION['access_token']);
-    } 
-        
+
     $client->setRedirectUri('http://' . $_SERVER['HTTP_HOST'] . '/index.php');
         
 ?>
