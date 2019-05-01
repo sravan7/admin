@@ -1,20 +1,18 @@
 <?php
 // Include configuration file
-require_once 'permission.php';
+// require_once 'permission.php';
 require_once __DIR__.'/vendor/autoload.php';
 
 session_start();
 ini_set(' session.save_path',realpath(dirname($_SERVER['DOCUMENT_ROOT'])));
 $client = new Google_Client();
 $client->setAuthConfig('client_secret_303235166535-nfblp1roplc8ku613gsm2to01g3cafjh.apps.googleusercontent.com.json');
-$client->setAccessType("offline");        // offline access
-$client->setIncludeGrantedScopes(true);   // incremental auth
 $client->setHostedDomain("iiitdm.ac.in");
 $client->addScope("https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.email");
 
 if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
   $client->setAccessToken($_SESSION['access_token']);
-  $files = $drive->files->listFiles(array())->getItems();
+
   $Oauth = new Google_Service_Oauth2($client);
   $gpUserProfile = $Oauth->userinfo_v2_me->get();
   //$gpUserProfile = $google_oauthV2->userinfo->get();
@@ -31,9 +29,7 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
   $gpUserData['picture']    = !empty($gpUserProfile['picture'])?$gpUserProfile['picture']:'';
   $gpUserData['link']       = !empty($gpUserProfile['link'])?$gpUserProfile['link']:'';
   
-  // Insert or update user data to the database
-  $gpUserData['oauth_provider'] = 'google';
-  
+
   
   // Storing user data in the session
   $_SESSION['userData'] = $gpUserData;
@@ -41,18 +37,6 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
   // echo($client->getAccessToken());
   if($_SESSION["userData"]){
       $_SESSION["loggedIn"]=1;
-      /*
-      $output .= '<center>';
-      $output  .= '<h2>Google Account Details</h2>';
-      $output .= '<img src="'.$gpUserData['picture'].'">';
-      $output .= '<p><b>Google ID:</b> '.$gpUserData['oauth_uid'].'</p>';
-      $output .= '<p><b>Name:</b> '.$gpUserData['first_name'].' '.$gpUserData['last_name'].'</p>';
-      $output .= '<p><b>Email:</b> '.$gpUserData['email'].'</p>';
-      $output .= '<p><b>Logged in with:</b> Google</p>';
-      $output .= '<p><a href="'.$gpUserData['link'].'" target="_blank">Click to visit Google+</a></p>';
-      $output .= '<p>Logout from <a href="logout.php">Google</a></p>';
-      $output .= '</center>';
-      */
   }
   else{
       $_SESSION["loggedIn"]=-1;
