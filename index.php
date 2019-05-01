@@ -1,28 +1,13 @@
 <?php
 // Include configuration file
 require_once 'permission.php';
+require_once __DIR__.'/vendor/autoload.php';
+
+session_start();
+
 if(isset($_GET['code'])){
-    //$client->authenticate($_GET['code']);
-    //$_SESSION['token'] = $client->getAccessToken();
-    $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-    $client->setAccessToken($token);
-    $_SESSION['token'] = $token;
-    header('Location: index.php');
-}
-
-if(!empty($_SESSION['token'])){
-    $client->setAccessToken($_SESSION['token']);
-    if ($client->isAccessTokenExpired()) {
-        unset($_SESSION['token']);
-        $client->revokeToken();
-
-    // Destroy entire session data
-        session_destroy();
-      }
-}
-
-if($client->getAccessToken()){
     // Get user profile data from google
+    $_SESSION['access_token'] = $client->getAccessToken();
     $Oauth = new Google_Service_Oauth2($client);
     $gpUserProfile = $Oauth->userinfo_v2_me->get();
     //$gpUserProfile = $google_oauthV2->userinfo->get();
